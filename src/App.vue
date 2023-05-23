@@ -1,9 +1,13 @@
 <script setup>
 import {reactive} from 'vue' ;
+import TaskList from './components/TaskList.vue';
+import Form from './components/Form.vue';
+import Header from './components/Header.vue';
 
 const status = reactive ({
   filter:'all',
   tempTask: '',
+  tempStatus: false,
   tasks: [
   {
       title: 'Estudar ES6',
@@ -33,13 +37,36 @@ const getFilterTasks = () => {
   
   switch(filter) {
     case 'pending':
-      return getPendingTasks() ;
+      const getPendingTemp = getPendingTasks() ;
+      // status.tempStatus = false ;
+
+      // if (getPendingTemp.length == 0) {
+      //   status.tempStatus = true ;
+      // } else {
+      //   status.tempStatus = false ;
+      // }
+
+      return getPendingTemp ;
+      
     case 'finished':
-      return getFinishedTasks() ;
+    const getFinishedTemp = getFinishedTasks() ;
+      // status.tempStatus = false ;
+
+      // if (getFinishedTemp.length == 0) {
+      //   status.tempStatus = true ;
+      // } else {
+      //   status.tempStatus = false ;
+      // }
+
+      return getFinishedTemp ;
+
     default:
+      // status.tempStatus = false ;
+
       return status.tasks ;
   }
 }
+
 
 const addTask = () => {
   const newTask = {
@@ -53,44 +80,14 @@ const addTask = () => {
 
 </script>
 
-
-
 <template>
   <div class="container">
-    <header class="p-5 mb-4 mt-4 bg-light rounded-3">
-      <h1>Minhas tarefas</h1>
-      <p>Você possui {{ getPendingTasks().length }} tarefas pendentes</p>
-    </header>
-    <form @submit.prevent="addTask()">
-      <div class="row">
-        <div class="col">
-          <input required :value="status.tempTask" @change="event => status.tempTask = event.target.value" type="text" class="form-control" placeholder="Digite aqui a descrição da tarefa">
-        </div>
-        <div class="col-md-2">
-          <button type="submit" class="btn btn-primary">Cadastrar</button>
-        </div>
-        <div class="col-md-2">
-          <select class="form-control" @change="event => status.filter = event.target.value">
-            <option value="all">Todas as tarefas</option>
-            <option value="pending">Pendentes</option>
-            <option value="finished">Finalizadas</option>
-          </select>
-        </div>
-      </div>
-    </form>
-    <ul class="list-group mt-4">
-      <li class="list-group-item" v-for="task in getFilterTasks()">
-        <input type="checkbox" :checked="task.finished" :id="task.title" @change="event => task.finished = event.target.checked">
-        <label :for="task.title" class="ms-3" :class="{done: task.finished}">{{ task.title }}</label>
-      </li>
-    </ul>
+    <Header :pending-tasks="getPendingTasks().length" />
+    <Form :temp-task="status.tempTask" :edit-temp-task="event => status.tempTask = event.target.value" :add-task="addTask" :filter-change="event => status.filter = event.target.value" />
+    <TaskList :tasks="getFilterTasks()"/>
   </div>
 </template>
 
 
 
-<style scoped>
-  .done {
-    text-decoration: line-through;
-  }
-</style>
+
